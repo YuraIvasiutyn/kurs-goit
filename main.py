@@ -20,33 +20,32 @@ def get_days_from_today(date: str) -> int:
     return timedelta_obj.days
 
 print(get_days_from_today("2025-12-31"))
-print(get_days_from_today("2024"))
-print(get_days_from_today("2024.11.12"))
+print(get_days_from_today("2024-11-12"))
 
 
-def get_numbers_ticket(min: int, max: int, qualtity: int) -> List[int]:
+def get_numbers_ticket(min: int, max: int, quantity: int) -> List[int]:
     if min < 0 or max > 1_000:
-        raise ValueError("Числа не можуть бути менші від 0 і більші за 1.000")
+        return []
     
-    if qualtity > max or qualtity < min:
-        raise ValueError("Кількість чисел повинна бути в заданому діапазоні {min}-{max}")
+    if quantity < 1 or quantity > (max - min + 1):
+        return []
 
     elements = [i for i in range(min, max+1)]
 
-    result = sample(elements, k=qualtity)
+    result = sample(elements, k=quantity)
     result.sort() # без створення нового об'єкту
 
     return result
 
 
-print(get_numbers_ticket(1, 10, 9))
+print(get_numbers_ticket(5, 10, 2))
 
 
 def normalize_phone(phone_number: str) -> str:
 
     new_obj = phone_number.strip()
 
-    pattern = "-().?! "
+    pattern = "-().?! \\t\\n"
     trantab = str.maketrans('', '', pattern)
     format_number = new_obj.translate(trantab)
 
@@ -56,16 +55,22 @@ def normalize_phone(phone_number: str) -> str:
         format_number = format_number[2:]
     
     if not format_number.isdigit():
-        raise ValueError(f"Формат номеру складається не тільки з цифр")
+        print(f"Формат номеру складається не тільки з цифр {format_number}")
 
     return "+38" + format_number
     
 
 
-
-print(normalize_phone("    +38(050)123-32-34"))
-print(normalize_phone("     0503451234"))
-print(normalize_phone("(050)8889900"))
-print(normalize_phone("38050-111-22-22"))
-print(normalize_phone("38050 111 22 11   "))
-
+raw_numbers = [
+    "067\\t123 4567",
+    "(095) 234-5678\\n",
+    "+380 44 123 4567",
+    "380501234567",
+    "    +38(050)123-32-34",
+    "     0503451234",
+    "(050)8889900",
+    "38050-111-22-22",
+    "38050 111 22 11   ",
+]
+sanitized_numbers = [normalize_phone(num) for num in raw_numbers]
+print("Нормалізовані номери телефонів для SMS-розсилки:", sanitized_numbers)
